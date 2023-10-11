@@ -1,4 +1,5 @@
 import express from 'express';
+import {router as userRouter} from "./users/users.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.all('/hello', (req, res, next) => {
     });
     next();
 })
+app.use('/users', userRouter);
 app.get('/hello', (req, res) => {
     res.status(201).send('Hello!');
 })
