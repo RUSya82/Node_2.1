@@ -5,6 +5,10 @@ const app = express();
 
 const port = 8000;
 
+app.use((req, res, next) => {
+    console.log('Time', Date.now());
+    next();
+})
 app.all('/hello', (req, res, next) => {
     console.log('All');
     res.cookie('token', 'hello', {
