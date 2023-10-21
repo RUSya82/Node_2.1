@@ -1,8 +1,8 @@
-import express from "express";
+import express, {Request, Response, NextFunction} from "express";
 
 const router = express.Router();
 
-router.post('/login', (req, res) => {
+router.post('/login', (req: Request, res: Response) => {
     res.cookie('token', 'a64cdb5699cad', {
         secure: true,
         domain: '/'
@@ -13,7 +13,7 @@ router.post('/login', (req, res) => {
         role: 'admin'
     })
 });
-router.post('/register', (req, res) => {
+router.post('/register', (req: Request, res: Response) => {
     res.cookie('token', 'a64c6541654db5699cad', {
         secure: true,
         domain: '/'
