@@ -2,26 +2,26 @@ import {Server} from 'node:http';
 import express, {Express} from 'express';
 import {LoggerService} from './logger/logger.service';
 import {BaseController} from './common/base.controller';
+import {UserController} from './users/user.controller';
 import {ExceptionFilter} from './errors/exception.filter';
+import {ILogger} from './logger/logger.interface';
+import {inject, injectable} from 'inversify';
+import {TYPES} from './types';
+import 'reflect-metadata';
 
+@injectable()
 export class App {
     app: Express;
     port: number;
     server: Server;
-    logger: LoggerService;
-    userController: BaseController;
-    exceptionFilter: ExceptionFilter;
 
     constructor(
-        logger: LoggerService,
-        userController: BaseController,
-        exceptionFilter: ExceptionFilter
+        @inject(TYPES.ILogger) private loggerService: ILogger,
+        @inject(TYPES.UserController) private userController: UserController,
+        @inject(TYPES.ExceptionFilter) private exceptionFilter: ExceptionFilter,
     ) {
         this.port = 8000;
         this.app = express();
-        this.logger = logger;
-        this.userController = userController;
-        this.exceptionFilter = exceptionFilter;
     }
 
     userRouters() {
@@ -35,7 +35,7 @@ export class App {
         this.userRouters();
         this.useExceptionFilters()
         this.server = this.app.listen(this.port);
-        this.logger.log(`Server started at port ${this.port}`);
+        this.loggerService.log(`Server started at port ${this.port}`);
     }
 
 }
