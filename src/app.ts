@@ -1,7 +1,5 @@
 import { Server } from 'node:http';
 import express, { Express } from 'express';
-import { LoggerService } from './logger/logger.service';
-import { BaseController } from './common/base.controller';
 import { UserController } from './users/user.controller';
 import { ExceptionFilter } from './errors/exception.filter';
 import { ILogger } from './logger/logger.interface';

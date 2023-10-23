@@ -25,7 +25,8 @@ export class UserController extends BaseController implements IUserController {
 		]);
 	}
 	login(req: Request, res: Response, next: NextFunction): void {
-		next(new HttpError(401, 'не авторизован', 'login'));
+		console.log('debug');
+		next(new HttpError(401, 'не очень авторизован', 'login'));
 		// this.setCookie(res, 'token', 'a64c6541654db5699cad', {
 		//     secure: true,
 		//     domain: '/'
