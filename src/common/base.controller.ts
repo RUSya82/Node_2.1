@@ -1,47 +1,44 @@
-import {LoggerService} from '../logger/logger.service';
-import {IControllerRoute} from './route.interface';
-import {Response, Router} from 'express';
-import {ILogger} from '../logger/logger.interface';
-import {injectable} from 'inversify';
+import { ExpressReturnType, IControllerRoute } from './route.interface';
+import { CookieOptions, Response, Router } from 'express';
+import { ILogger } from '../logger/logger.interface';
+import { injectable } from 'inversify';
 import 'reflect-metadata';
 
-// @ts-ignore
 @injectable()
 export abstract class BaseController {
-    private readonly _router: Router;
-    // protected logger: LoggerService
+	private readonly _router: Router;
+	// protected logger: LoggerService
 
-    protected constructor(private logger: ILogger) {
-        this._router = Router();
-    }
+	constructor(private logger: ILogger) {
+		this._router = Router();
+	}
 
-    get router() {
-        return this._router;
-    }
+	get router(): Router {
+		return this._router;
+	}
 
-    public send<T>(res: Response, code: number, message: T) {
-        res.type('application/json');
-        return res.status(code).json(message);
-    }
+	public send<T>(res: Response, code: number, message: T): ExpressReturnType {
+		res.type('application/json');
+		return res.status(code).json(message);
+	}
 
-    public created(res: Response) {
-        return res.sendStatus(201);
-    }
+	public created(res: Response): ExpressReturnType {
+		return res.sendStatus(201);
+	}
 
-    public setCookie(res: Response, token: string, value: string, options: Object) {
-        return res.cookie(token, value, options);
-    }
+	public setCookie(res: Response, token: string, value: string, options: CookieOptions): ExpressReturnType {
+		return res.cookie(token, value, options);
+	}
 
+	public ok<T>(res: Response, message: T): ExpressReturnType {
+		return this.send<T>(res, 200, message);
+	}
 
-    public ok<T>(res: Response, message: T) {
-        return this.send<T>(res, 200, message);
-    }
-
-    protected bindRoutes(routes: IControllerRoute[]) {
-        for (const route of routes) {
-            this.logger.log(`[${route.method}] bind ${route.path}`);
-            const handler = route.func.bind(this);
-            this.router[route.method](route.path, handler);
-        }
-    }
+	protected bindRoutes(routes: IControllerRoute[]): void {
+		for (const route of routes) {
+			this.logger.log(`[${route.method}] bind ${route.path}`);
+			const handler = route.func.bind(this);
+			this.router[route.method](route.path, handler);
+		}
+	}
 }
