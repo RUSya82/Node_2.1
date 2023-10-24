@@ -6,6 +6,7 @@ import { ILogger } from './logger/logger.interface';
 import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
 import 'reflect-metadata';
+// import {json} from 'body-parser'; - в 3 версии этого не было и нужна была эта библиотека
 
 @injectable()
 export class App {
@@ -21,7 +22,9 @@ export class App {
 		this.port = 8000;
 		this.app = express();
 	}
-
+	useMiddleware(){
+		this.app.use(express.json());
+	}
 	userRouters(): void {
 		this.app.use('/users', this.userController.router);
 	}
@@ -30,6 +33,7 @@ export class App {
 	}
 
 	public async init(): Promise<void> {
+		this.useMiddleware();
 		this.userRouters();
 		this.useExceptionFilters();
 		this.server = this.app.listen(this.port);

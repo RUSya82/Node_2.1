@@ -6,22 +6,10 @@ import { TYPES } from '../types';
 import { ILogger } from '../logger/logger.interface';
 import 'reflect-metadata';
 import { IUserController } from './user.controller.interface';
+import { UserLoginDto } from './dto/user-login.dto';
+import { UserRegisterDto } from './dto/user-register.dto';
 
-// class User{
-// 	private _arr: number[] = [];
-// 	constructor(count: number) {
-// 		if(count > 1){
-// 			for (let i = 0; i < count; i++){
-// 				this.arr.push(i*2)
-// 			}
-// 		}
-//
-// 	}
-// 	get arr () {
-// 		return this._arr
-// 	}
-// }
-// const users = [];
+
 @injectable()
 export class UserController extends BaseController implements IUserController {
 	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
@@ -39,19 +27,19 @@ export class UserController extends BaseController implements IUserController {
 			},
 		]);
 	}
-	login(req: Request, res: Response, next: NextFunction): void {
-		// users.push(new User(1355));
-		next(new HttpError(401, 'не очень авторизован', 'login'));
-		// this.setCookie(res, 'token', 'a64c6541654db5699cad', {
-		//     secure: true,
-		//     domain: '/'
-		// });
-		// this.logger.log(`Route /login`);
-		// this.ok(res, 'login');
+	login(req: Request<{},{},UserLoginDto>, res: Response, next: NextFunction): void {
+		console.log(req.body);
+		// next(new HttpError(401, 'не очень авторизован', 'login'));
+		this.setCookie(res, 'token', 'a64c6541654db5699cad', {
+		    secure: true,
+		    domain: '/'
+		});
+		this.loggerService.log(`Route /login`);
+		this.ok(res, 'login');
 	}
-	register(req: Request, res: Response, next: NextFunction): void {
+	register(req: Request<{},{},UserRegisterDto>, res: Response, next: NextFunction): void {
+		console.log(req.body);
 		this.loggerService.log(`Route /register`);
-		// users.push(new User(1355000));
 		this.created(res);
 	}
 }
