@@ -8,11 +8,15 @@ import 'reflect-metadata';
 import { IUserController } from './user.controller.interface';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
+import { IUserService } from './user.service.interface';
 
 
 @injectable()
 export class UserController extends BaseController implements IUserController {
-	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+	constructor(
+		@inject(TYPES.ILogger) private loggerService: ILogger,
+		@inject(TYPES.UserService) private userService: IUserService,
+	) {
 		super(loggerService);
 		this.bindRoutes([
 			{
@@ -27,19 +31,24 @@ export class UserController extends BaseController implements IUserController {
 			},
 		]);
 	}
-	login(req: Request<{},{},UserLoginDto>, res: Response, next: NextFunction): void {
+
+	login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): void {
 		console.log(req.body);
 		// next(new HttpError(401, 'не очень авторизован', 'login'));
 		this.setCookie(res, 'token', 'a64c6541654db5699cad', {
-		    secure: true,
-		    domain: '/'
+			secure: true,
+			domain: '/',
 		});
 		this.loggerService.log(`Route /login`);
 		this.ok(res, 'login');
 	}
-	register(req: Request<{},{},UserRegisterDto>, res: Response, next: NextFunction): void {
-		console.log(req.body);
-		this.loggerService.log(`Route /register`);
-		this.created(res);
+
+	async register({ body }: Request<{}, {}, UserRegisterDto>, res: Response, next: NextFunction): Promise<void> {
+		const newUser = await this.userService.createUser(body);
+		if (!newUser) {
+			return next(new HttpError(422, 'User is already exist'));
+		}
+		this.loggerService.log(`User ${newUser.username} created`);
+		this.created(res, {email: newUser.email});
 	}
 }

@@ -22,8 +22,8 @@ export abstract class BaseController {
 		return res.status(code).json(message);
 	}
 
-	public created(res: Response): ExpressReturnType {
-		return res.sendStatus(201);
+	public created<T>(res: Response, message: T): ExpressReturnType {
+		return this.send<T>(res, 201, message);
 	}
 
 	public setCookie(res: Response, token: string, value: string, options: CookieOptions): ExpressReturnType {
@@ -37,8 +37,10 @@ export abstract class BaseController {
 	protected bindRoutes(routes: IControllerRoute[]): void {
 		for (const route of routes) {
 			this.logger.log(`[${route.method}] bind ${route.path}`);
-			const handler = route.func.bind(this);
-			this.router[route.method](route.path, handler);
+			const middleware = route.middlewares?.map(e => e.execute.bind(e));//привязка к контексту
+			const handler = route.func.bind(this);//привязка к контексту
+			const pipeline = middleware ? [...middleware, handler] : handler;//собираем массив обработчиков
+			this.router[route.method](route.path, pipeline);
 		}
 	}
 }
