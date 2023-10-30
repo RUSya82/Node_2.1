@@ -6,6 +6,7 @@ import { ILogger } from './logger/logger.interface';
 import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
 import 'reflect-metadata';
+import { IExceptionFilter } from './errors/exception.filter.interface';
 // import {json} from 'body-parser'; - в 3 версии этого не было и нужна была эта библиотека
 
 @injectable()
@@ -17,12 +18,12 @@ export class App {
 	constructor(
 		@inject(TYPES.ILogger) private loggerService: ILogger,
 		@inject(TYPES.UserController) private userController: UserController,
-		@inject(TYPES.ExceptionFilter) private exceptionFilter: ExceptionFilter,
+		@inject(TYPES.ExceptionFilter) private exceptionFilter: IExceptionFilter,
 	) {
 		this.port = 8000;
 		this.app = express();
 	}
-	useMiddleware(){
+	useMiddleware() {
 		this.app.use(express.json());
 	}
 	userRouters(): void {

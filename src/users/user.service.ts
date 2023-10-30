@@ -11,7 +11,7 @@ export class UserService implements IUserService {
 		await newUser.setPassword(password);
 		return newUser;
 	}
-	async validateUser(dto: UserLoginDto): Promise<boolean>{
+	async validateUser(dto: UserLoginDto): Promise<boolean> {
 		return true;
 	}
 }

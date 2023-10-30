@@ -9,7 +9,7 @@ import { IExceptionFilter } from './errors/exception.filter.interface';
 import 'reflect-metadata';
 import { IUserController } from './users/user.controller.interface';
 import { IUserService } from './users/user.service.interface';
-import {UserService} from './users/user.service';
+import { UserService } from './users/user.service';
 
 export const appBinding = new ContainerModule((bind: interfaces.Bind) => {
 	bind<ILogger>(TYPES.ILogger).to(LoggerService);
