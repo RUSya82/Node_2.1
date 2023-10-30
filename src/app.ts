@@ -7,6 +7,9 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
 import 'reflect-metadata';
 import { IExceptionFilter } from './errors/exception.filter.interface';
+import { IConfigService } from './config/config.service.interface';
+import { IUserController } from './users/user.controller.interface';
+import { PrismaService } from './database/prisma.service';
 // import {json} from 'body-parser'; - в 3 версии этого не было и нужна была эта библиотека
 
 @injectable()
@@ -19,6 +22,8 @@ export class App {
 		@inject(TYPES.ILogger) private loggerService: ILogger,
 		@inject(TYPES.UserController) private userController: UserController,
 		@inject(TYPES.ExceptionFilter) private exceptionFilter: IExceptionFilter,
+		@inject(TYPES.ConfigService) private configService: IConfigService,
+		@inject(TYPES.PrismaService) private prismaService: PrismaService,
 	) {
 		this.port = 8000;
 		this.app = express();
@@ -37,6 +42,7 @@ export class App {
 		this.useMiddleware();
 		this.userRouters();
 		this.useExceptionFilters();
+		await this.prismaService.connect();
 		this.server = this.app.listen(this.port);
 		this.loggerService.log(`Server started at port ${this.port}`);
 	}
