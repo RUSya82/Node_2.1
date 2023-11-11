@@ -23,6 +23,7 @@ export class UserController extends BaseController implements IUserController {
 				path: '/login',
 				method: 'post',
 				func: this.login,
+				middlewares: [new ValidateMiddleware(UserLoginDto)]
 			},
 			{
 				path: '/register',
@@ -33,15 +34,12 @@ export class UserController extends BaseController implements IUserController {
 		]);
 	}
 
-	login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): void {
-		console.log(req.body);
-		// next(new HttpError(401, 'не очень авторизован', 'login'));
-		this.setCookie(res, 'token', 'a64c6541654db5699cad', {
-			secure: true,
-			domain: '/',
-		});
-		this.loggerService.log(`Route /login`);
-		this.ok(res, 'login');
+	async login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): Promise<void> {
+		const result = await this.userService.validateUser(req.body);
+		if (!result) {
+			return next(new HttpError(401, 'ошибка авторизации', 'login'));
+		}
+		this.ok(res, {"login": "success"});
 	}
 
 	async register({ body }: Request<{}, {}, UserRegisterDto>, res: Response, next: NextFunction): Promise<void> {
@@ -50,6 +48,6 @@ export class UserController extends BaseController implements IUserController {
 			return next(new HttpError(422, 'User is already exist'));
 		}
 		this.loggerService.log(`User ${newUser.username} created`);
-		this.created(res, { email: newUser.email });
+		this.created(res, { email: newUser.email, id: newUser.id });
 	}
 }
